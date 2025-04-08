@@ -1,47 +1,25 @@
-import math
-from sympy import isprime, mod_inverse
-
-p = int(input("P : "))
-if(not isprime(p)):
-    print("P must be prime !")
-    exit()
-
-q = int(input("Q : "))
-if(not isprime(q)):
-    print("Q must be prime !")
-    exit()
-
+from math import gcd
+from sympy import isprime
+p = int(input("Enter large prime p : "))
+q = int(input("Enter large prime q : "))
+while not isprime(p) :
+    print("Not prime !")
+    p = int(input("Enter large prime p : "))
+while not isprime(q) :
+    print("Not prime !")
+    q = int(input("Enter large prime q : "))
 n = p*q
 phi = (p-1)*(q-1)
-e = 65537
-
-if(e >= phi):
-    for i in range(2, phi):
-        if(math.gcd(i, phi) == 1):
-            e = i
-            break
-
-print(f"E : {e}")
-d = mod_inverse(e, phi)
-print(f"Public key : ({e},{n})")
-print(f"Private key : ({d},{n})")
-
-pt = input("Enter message to encrypt : ")
-pt = int.from_bytes(pt.encode('utf-8'), byteorder='big')
-
-if(pt >= n):
-    print("Message too large for key size !")
-    exit()
-
-ct = pow(pt, e, n)
-print(f"Encrypted message(integer) : {ct}")
-
-def int_to_string(num):
-    byte_length = (num.bit_length() + 7) // 8
-    return num.to_bytes(byte_length, byteorder='big').decode('utf-8')
-
-pt = pow(ct, d, n)
-print(f"Decrypted Message : {int_to_string(pt)}")
-
-
-
+e = int(input("Enter starting range for e : "))
+for i in range(e,phi) :
+    if(gcd(i,phi)==1) :
+        e = i
+        break
+print(f"Public Key : ({e},{n})")
+d = pow(e,-1,phi)
+print(f"Private Key : ({d},{n})")
+plainText = int(input("Enter message(numeric) to encrypt : "))
+cipherText = pow(plainText,e,n)
+print(f"Encrypted text : {cipherText}")
+plainText = pow(cipherText,d,n)
+print(f"Decrypted text : {plainText}")

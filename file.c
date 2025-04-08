@@ -1,27 +1,22 @@
 #include<stdio.h>
 #include<fcntl.h>
 #include<unistd.h>
-
-#define BUFFER_SIZE 1024
+#define BUFFERSIZE 1024
 
 int main() {
-    char in_file[100],out_file[100];
-    printf("\nEnter input file name : ");
-    scanf("%s",in_file);
-    printf("\nEnter output file name : ");
-    scanf("%s",out_file);
-
-    int fin = open(in_file,O_RDONLY);
-    int fout = open(out_file,O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    
-    char buffer[BUFFER_SIZE];
-    int bytes_read;
-    while((bytes_read=read(fin,buffer,BUFFER_SIZE))>0) {
+    int bytes_read,fin,fout;
+    char infile[100],outfile[100];
+    char buffer[BUFFERSIZE];
+    printf("Enter input file name : ");
+    scanf("%s",infile);
+    printf("Enter output file name : ");
+    scanf("%s",outfile);
+    fin = open(infile,O_RDONLY);
+    fout = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    while((bytes_read=read(fin,buffer,BUFFERSIZE))>0) {
         write(fout,buffer,bytes_read);
     }
-
     close(fin);
     close(fout);
-    printf("Success!");
     return 0;
 }

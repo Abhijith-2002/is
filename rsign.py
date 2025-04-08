@@ -1,45 +1,36 @@
-import math
-from sympy import isprime, mod_inverse,randprime
+from math import gcd
+from sympy import isprime
 from hashlib import sha256
-
-bits = 512
-lb = 2**(bits-1)
-ub = 2**(bits)
-p = randprime(lb,ub)
-q = randprime(lb,ub)
-print(f"Large prime P generated : {p}")
-print(f"Large prime Q generated : {q}")
-
+p = int(input("Enter large prime p : "))
+q = int(input("Enter large prime q : "))
+while not isprime(p) :
+    print("Not prime !")
+    p = int(input("Enter large prime p : "))
+while not isprime(q) :
+    print("Not prime !")
+    q = int(input("Enter large prime q : "))
 n = p*q
 phi = (p-1)*(q-1)
-e = 65537
-
-if(e >= phi):
-    for i in range(2, phi):
-        if(math.gcd(i, phi) == 1):
-            e = i
-            break
-
-print(f"E : {e}")
-d = mod_inverse(e, phi)
-print(f"Public key : ({e},{n})")
-print(f"Private key : ({d},{n})")
-
+e = int(input("Enter starting range for e : "))
+for i in range(e,phi) :
+    if(gcd(i,phi)==1) :
+        e = i
+        break
+print(f"Public Key : ({e},{n})")
+d = pow(e,-1,phi)
+print(f"Private Key : ({d},{n})")
 message = input("Enter message to sign : ")
-hash_val = int(sha256(message.encode('utf-8')).hexdigest(),16)
-print(f"Hash Original : {hash_val}")
-sign = pow(hash_val,d,n)
+hash = sha256(message.encode()).hexdigest()
+hash_int = int(hash,16)%n
+sign = pow(hash_int,d,n)
 print(f"Digital Signature : {sign}")
-
-decrypted_hash = pow(sign,e,n)
-print(f"Hash Decrypted : {decrypted_hash}")
-
 message_rec = input("Enter message to verify : ")
-
-hash_val_computed = int(sha256(message_rec.encode('utf-8')).hexdigest(),16)
-print(f"Hash Computed : {hash_val_computed}")
-
-if(decrypted_hash==hash_val_computed) :
-    print("Digital Signature Verified !")
+e_rec = int(input("Enter public key e : "))
+n_rec = int(input("Enter public key n : "))
+sign_rec = int(input("Enter digital signature : "))
+hash_int_computed = int(sha256(message_rec.encode()).hexdigest(),16)%n_rec
+hash_decrypted = pow(sign_rec,e_rec,n_rec)
+if(hash_decrypted==hash_int_computed) :
+    print("Digital signature verified")
 else :
-    print("Digital Signature Not Verified !")
+    print("Invalid digital signature !")
